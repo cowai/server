@@ -254,7 +254,7 @@ class ShareByMailProvider implements IShareProvider {
 			[$userFolder->getRelativePath($share->getNode()->getPath()), $share->getSharedWith()],
 			$share->getSharedBy(),
 			$share->getNode()->getId(),
-			$userFolder->getRelativePath($share->getNode()->getPath())
+			(string) $userFolder->getRelativePath($share->getNode()->getPath())
 		);
 
 		if ($share->getShareOwner() !== $share->getSharedBy()) {
@@ -264,11 +264,10 @@ class ShareByMailProvider implements IShareProvider {
 			$ownerPath = $nodes[0]->getPath();
 			$this->publishActivity(
 				$type === 'share' ? Activity::SUBJECT_SHARED_EMAIL_BY : Activity::SUBJECT_UNSHARED_EMAIL_BY,
-				Activity::SUBJECT_SHARED_EMAIL_BY,
 				[$ownerFolder->getRelativePath($ownerPath), $share->getSharedWith(), $share->getSharedBy()],
 				$share->getShareOwner(),
 				$fileId,
-				$ownerFolder->getRelativePath($ownerPath)
+				(string) $ownerFolder->getRelativePath($ownerPath)
 			);
 		}
 
@@ -291,7 +290,7 @@ class ShareByMailProvider implements IShareProvider {
 				[$userFolder->getRelativePath($share->getNode()->getPath())],
 				$share->getSharedBy(),
 				$share->getNode()->getId(),
-				$userFolder->getRelativePath($share->getNode()->getPath())
+				(string) $userFolder->getRelativePath($share->getNode()->getPath())
 			);
 		} else {
 			$this->publishActivity(
@@ -299,7 +298,7 @@ class ShareByMailProvider implements IShareProvider {
 				[$userFolder->getRelativePath($share->getNode()->getPath()), $sharedWith],
 				$share->getSharedBy(),
 				$share->getNode()->getId(),
-				$userFolder->getRelativePath($share->getNode()->getPath())
+				(string) $userFolder->getRelativePath($share->getNode()->getPath())
 			);
 		}
 	}
@@ -308,13 +307,13 @@ class ShareByMailProvider implements IShareProvider {
 	/**
 	 * publish activity if a file/folder was shared by mail
 	 *
-	 * @param $subject
-	 * @param $parameters
-	 * @param $affectedUser
-	 * @param $fileId
-	 * @param $filePath
+	 * @param string $subject
+	 * @param array $parameters
+	 * @param string $affectedUser
+	 * @param int $fileId
+	 * @param string $filePath
 	 */
-	protected function publishActivity($subject, $parameters, $affectedUser, $fileId, $filePath) {
+	protected function publishActivity(string $subject, array $parameters, string $affectedUser, int $fileId, string $filePath) {
 		$event = $this->activityManager->generateEvent();
 		$event->setApp('sharebymail')
 			->setType('shared')
@@ -599,7 +598,7 @@ class ShareByMailProvider implements IShareProvider {
 			'shareWith' => $shareWith,
 		]);
 
-		$emailTemplate->setSubject($this->l->t('Password to access »%1$s« shared with %2$s', [$filename, $shareWith]));
+		$emailTemplate->setSubject($this->l->t('Password to access »%1$s« shared by you with %2$s', [$filename, $shareWith]));
 		$emailTemplate->addHeader();
 		$emailTemplate->addHeading($this->l->t('Password to access »%s«', [$filename]), false);
 		$emailTemplate->addBodyText($bodyPart);

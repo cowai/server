@@ -17,6 +17,7 @@ OC.L10N.register(
     "matches" : "ταιριάζει",
     "does not match" : "δεν ταιριάζει",
     "Example: {placeholder}" : "Παράδειγμα: {placeholder}",
+    "File name" : "Όνομα αρχείου",
     "File size (upload)" : "Μέγεθος αρχείου (μεταφόρτωση)",
     "less" : "Λιγότερα",
     "less or equals" : "Λιγότερο ή ίσον",
@@ -66,8 +67,8 @@ OC.L10N.register(
     "Check %s does not exist" : "Έλεγχος %s δεν υπάρχει",
     "Check %s is invalid" : "Έλεγχος %s δεν είναι έγκυρος",
     "Check #%s does not exist" : "Έλεγχος #%s δεν υπάρχει",
-    "Workflow" : "Ροή εργασίας",
     "Open documentation" : "Άνοιγμα τεκμηρίωσης",
-    "Loading…" : "Φορτώνει..."
+    "Loading…" : "Φορτώνει...",
+    "Workflow" : "Ροή εργασίας"
 },
 "nplurals=2; plural=(n != 1);");

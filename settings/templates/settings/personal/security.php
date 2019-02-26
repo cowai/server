@@ -52,7 +52,7 @@ if($_['passwordChangeSupported']) {
 						   placeholder="<?php p($l->t('New password')); ?>"
 						   data-typetoggle="#personal-show"
 						   autocomplete="off" autocapitalize="none" autocorrect="off" />
-					<input type="checkbox" id="personal-show" name="show" /><label for="personal-show" class="personal-show-label"></label>
+					<input type="checkbox" id="personal-show" class="hidden-visually" name="show" /><label for="personal-show" class="personal-show-label"></label>
 				</div>
 
 				<input id="passwordbutton" type="submit" value="<?php p($l->t('Change password')); ?>" />
@@ -62,6 +62,36 @@ if($_['passwordChangeSupported']) {
 	<span class="msg"></span>
 </div>
 <?php } ?>
+
+<div id="two-factor-auth" class="section">
+	<h2><?php p($l->t('Two-Factor Authentication'));?></h2>
+	<a target="_blank" rel="noreferrer noopener" class="icon-info"
+	   title="<?php p($l->t('Open documentation'));?>"
+	   href="<?php p(link_to_docs('user-2fa')); ?>"></a>
+	<p class="settings-hint"><?php p($l->t('Use a second factor besides your password to increase security for your account.'));?></p>
+	<ul>
+	<?php foreach ($_['twoFactorProviderData']['providers'] as $data) { ?>
+		<li>
+			<?php
+			/** @var \OCP\Authentication\TwoFactorAuth\IProvidesPersonalSettings $provider */
+			$provider = $data['provider'];
+			if ($provider instanceof \OCP\Authentication\TwoFactorAuth\IProvidesIcons) {
+				$icon = $provider->getDarkIcon();
+			} else {
+				$icon = image_path('core', 'actions/password.svg');
+			}
+			/** @var \OCP\Authentication\TwoFactorAuth\IPersonalProviderSettings $settings */
+			$settings = $data['settings'];
+			?>
+			<h3>
+				<img class="two-factor-provider-settings-icon" src="<?php p($icon) ?>" alt="">
+				<?php p($provider->getDisplayName()) ?>
+			</h3>
+			<?php print_unescaped($settings->getBody()->fetchPage()) ?>
+		</li>
+	<?php } ?>
+	</ul>
+</div>
 
 <div id="security" class="section">
 	<h2><?php p($l->t('Devices & sessions'));?></h2>
@@ -98,30 +128,4 @@ if($_['passwordChangeSupported']) {
 			<button id="app-password-hide" class="button"><?php p($l->t('Done')); ?></button>
 		</div>
 	</div>
-</div>
-
-<div id="two-factor-auth" class="section">
-	<h2><?php p($l->t('Two-Factor Authentication'));?></h2>
-	<ul>
-	<?php foreach ($_['twoFactorProviderData']['providers'] as $data) { ?>
-		<li>
-			<?php
-			/** @var \OCP\Authentication\TwoFactorAuth\IProvidesPersonalSettings $provider */
-			$provider = $data['provider'];
-			if ($provider instanceof \OCP\Authentication\TwoFactorAuth\IProvidesIcons) {
-				$icon = $provider->getDarkIcon();
-			} else {
-				$icon = image_path('core', 'actions/password.svg');
-			}
-			/** @var \OCP\Authentication\TwoFactorAuth\IPersonalProviderSettings $settings */
-			$settings = $data['settings'];
-			?>
-			<h3>
-				<img class="two-factor-provider-settings-icon" src="<?php p($icon) ?>" alt="">
-				<?php p($provider->getDisplayName()) ?>
-			</h3>
-			<?php print_unescaped($settings->getBody()->fetchPage()) ?>
-		</li>
-	<?php } ?>
-	</ul>
 </div>

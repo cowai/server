@@ -58,6 +58,7 @@ use OC\AppFramework\Utility\SimpleContainer;
 use OC\AppFramework\Utility\TimeFactory;
 use OC\Authentication\LoginCredentials\Store;
 use OC\Authentication\Token\IProvider;
+use OC\Avatar\AvatarManager;
 use OC\Collaboration\Collaborators\GroupPlugin;
 use OC\Collaboration\Collaborators\MailPlugin;
 use OC\Collaboration\Collaborators\RemoteGroupPlugin;
@@ -141,8 +142,10 @@ use OCP\Files\NotFoundException;
 use OCP\Files\Storage\IStorageFactory;
 use OCP\FullTextSearch\IFullTextSearchManager;
 use OCP\GlobalScale\IConfig;
+use OCP\Group\ISubAdmin;
 use OCP\ICacheFactory;
 use OCP\IDBConnection;
+use OCP\IInitialStateService;
 use OCP\IL10N;
 use OCP\IServerContainer;
 use OCP\ITempManager;
@@ -413,9 +416,9 @@ class Server extends ServerContainer implements IServerContainer {
 			$userSession->listen('\OC\User', 'preLogin', function ($uid, $password) {
 				\OC_Hook::emit('OC_User', 'pre_login', array('run' => true, 'uid' => $uid, 'password' => $password));
 			});
-			$userSession->listen('\OC\User', 'postLogin', function ($user, $password) {
+			$userSession->listen('\OC\User', 'postLogin', function ($user, $password, $isTokenLogin) {
 				/** @var $user \OC\User\User */
-				\OC_Hook::emit('OC_User', 'post_login', array('run' => true, 'uid' => $user->getUID(), 'password' => $password));
+				\OC_Hook::emit('OC_User', 'post_login', array('run' => true, 'uid' => $user->getUID(), 'password' => $password, 'isTokenLogin' => $isTokenLogin));
 			});
 			$userSession->listen('\OC\User', 'postRememberedLogin', function ($user, $password) {
 				/** @var $user \OC\User\User */
@@ -961,7 +964,8 @@ class Server extends ServerContainer implements IServerContainer {
 					$c->getMemCacheFactory(),
 					new Util($c->getConfig(), $this->getAppManager(), $c->getAppDataDir('theming')),
 					new ImageManager($c->getConfig(), $c->getAppDataDir('theming'), $c->getURLGenerator(), $this->getMemCacheFactory(), $this->getLogger()),
-					$c->getAppManager()
+					$c->getAppManager(),
+					$c->getNavigationManager()
 				);
 			}
 			return new \OC_Defaults();
@@ -1200,6 +1204,10 @@ class Server extends ServerContainer implements IServerContainer {
 				$c->getConfig()
 			);
 		});
+
+		$this->registerAlias(ISubAdmin::class, SubAdmin::class);
+
+		$this->registerAlias(IInitialStateService::class, InitialStateService::class);
 
 		$this->connectDispatcher();
 	}

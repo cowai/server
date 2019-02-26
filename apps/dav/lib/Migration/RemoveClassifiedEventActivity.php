@@ -75,6 +75,10 @@ class RemoveClassifiedEventActivity implements IRepairStep {
 		$result = $query->execute();
 
 		while ($row = $result->fetch()) {
+			if ($row['principaluri'] === null) {
+				continue;
+			}
+
 			$delete->setParameter('owner', $this->getPrincipal($row['principaluri']))
 				->setParameter('type', 'calendar')
 				->setParameter('calendar_id', $row['calendarid'])
@@ -105,6 +109,10 @@ class RemoveClassifiedEventActivity implements IRepairStep {
 		$result = $query->execute();
 
 		while ($row = $result->fetch()) {
+			if ($row['principaluri'] === null) {
+				continue;
+			}
+
 			$delete->setParameter('owner', $this->getPrincipal($row['principaluri']))
 				->setParameter('type', 'calendar')
 				->setParameter('calendar_id', $row['calendarid'])
@@ -119,6 +127,6 @@ class RemoveClassifiedEventActivity implements IRepairStep {
 
 	protected function getPrincipal(string $principalUri): string {
 		$uri = explode('/', $principalUri);
-		return $uri[2];
+		return array_pop($uri);
 	}
 }

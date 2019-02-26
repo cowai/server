@@ -60,11 +60,11 @@ a {
 	* {
 		cursor: pointer;
 	}
-}
 
-a.external {
-	margin: 0 3px;
-	text-decoration: underline;
+	&.external {
+		margin: 0 3px;
+		text-decoration: underline;
+	}
 }
 
 input {
@@ -256,12 +256,6 @@ body {
 	user-select: none;
 }
 
-/* keep the labels for screen readers but hide them since we use placeholders */
-
-label.infield {
-	display: none;
-}
-
 /* Show password toggle */
 
 #show, #dbpassword {
@@ -269,10 +263,6 @@ label.infield {
 	right: 1em;
 	top: .8em;
 	float: right;
-}
-
-#show, #dbpassword, #personal-show {
-	display: none;
 }
 
 #show + label, #dbpassword + label {
@@ -290,10 +280,22 @@ label.infield {
 	position: absolute !important;
 	height: 20px;
 	width: 24px;
-	background-image: url('../img/actions/toggle.svg?v=1');
+	background-image: var(--icon-toggle-000);
 	background-repeat: no-repeat;
 	background-position: center;
 	opacity: .3;
+}
+
+/* Feedback for keyboard focus and mouse hover */
+#show,
+#dbpassword,
+#personal-show {
+	&:focus + label {
+		opacity: 1;
+	}
+	+ label:hover {
+		opacity: 1;
+	}
 }
 
 #show + label:before, #dbpassword + label:before, #personal-show + label:before {
@@ -312,8 +314,9 @@ label.infield {
 #personal-show + label {
 	display: block;
 	right: 0;
-	margin-top: -36px;
-    padding: 6px 4px;
+	margin-top: -43px;
+	margin-right: -4px;
+	padding: 22px;
 }
 
 /* Warnings and errors are the same */
@@ -322,6 +325,8 @@ label.infield {
 	margin-top: 8px;
 	padding: 5px;
 	border-radius: var(--border-radius);
+	color: var(--color-primary-text);
+	background-color: var(--color-warning);
 }
 
 .warning {
@@ -707,7 +712,7 @@ code {
 		box-sizing: border-box;
 
 		div:first-child a {
-			background-image: url('../img/places/home.svg?v=1');
+			background-image: var(--icon-home-000);
 			background-repeat: no-repeat;
 			background-position: left center;
 		}
@@ -741,11 +746,12 @@ code {
 			opacity: 1;
 		}
 	}
+
 	// keyboard focus
 	#picker-showgridview:focus + #picker-view-toggle {
 		opacity: 1;
 	}
-	
+
 	.actions.creatable {
 		flex-wrap: wrap;
 		padding: 0px;
@@ -759,14 +765,14 @@ code {
 		border-radius: var(--border-radius-pill);
 		position: absolute;
 		top: 4px;
-		
+
 		.icon.icon-add{
 			background-image: var(--icon-add-000);
 			background-size: 16px 16px;
-			max-height:36px;
-			width:36px;
-			margin:0px;
-			
+			max-height: 36px;
+			width: 36px;
+			margin: 0px;
+			opacity: .5;
 		}
 
 		a {

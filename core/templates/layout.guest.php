@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html class="ng-csp" data-placeholder-focus="false" lang="<?php p($_['language']); ?>" data-locale="<?php p($_['locale']); ?>" >
-	<head data-requesttoken="<?php p($_['requesttoken']); ?>">
+	<head
+<?php if ($_['user_uid']) { ?>
+	data-user="<?php p($_['user_uid']); ?>" data-user-displayname="<?php p($_['user_displayname']); ?>"
+<?php } ?>
+ data-requesttoken="<?php p($_['requesttoken']); ?>">
 		<meta charset="utf-8">
 		<title>
 		<?php p($theme->getTitle()); ?>
@@ -20,6 +24,9 @@
 	</head>
 	<body id="<?php p($_['bodyid']);?>">
 		<?php include 'layout.noscript.warning.php'; ?>
+		<?php foreach ($_['initialStates'] as $app => $initialState) { ?>
+			<input type="hidden" id="initial-state-<?php p($app); ?>" value="<?php p(base64_encode($initialState)); ?>">
+		<?php }?>
 		<div class="wrapper">
 			<div class="v-align">
 				<?php if ($_['bodyid'] === 'body-login' ): ?>

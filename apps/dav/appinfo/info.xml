@@ -5,7 +5,7 @@
 	<name>WebDAV</name>
 	<summary>WebDAV endpoint</summary>
 	<description>WebDAV endpoint</description>
-	<version>1.9.1</version>
+	<version>1.9.2</version>
 	<licence>agpl</licence>
 	<author>owncloud.org</author>
 	<namespace>DAV</namespace>
@@ -28,9 +28,11 @@
 	<repair-steps>
 		<post-migration>
 			<step>OCA\DAV\Migration\FixBirthdayCalendarComponent</step>
+			<step>OCA\DAV\Migration\RegenerateBirthdayCalendars</step>
 			<step>OCA\DAV\Migration\CalDAVRemoveEmptyValue</step>
 			<step>OCA\DAV\Migration\BuildCalendarSearchIndex</step>
 			<step>OCA\DAV\Migration\RefreshWebcalJobRegistrar</step>
+			<step>OCA\DAV\Migration\RemoveOrphanEventsAndContacts</step>
 			<step>OCA\DAV\Migration\RemoveClassifiedEventActivity</step>
 		</post-migration>
 		<live-migration>
@@ -41,6 +43,8 @@
 	<commands>
 		<command>OCA\DAV\Command\CreateAddressBook</command>
 		<command>OCA\DAV\Command\CreateCalendar</command>
+		<command>OCA\DAV\Command\MoveCalendar</command>
+		<command>OCA\DAV\Command\ListCalendars</command>
 		<command>OCA\DAV\Command\SyncBirthdayCalendar</command>
 		<command>OCA\DAV\Command\SyncSystemAddressBook</command>
 		<command>OCA\DAV\Command\RemoveInvalidShares</command>

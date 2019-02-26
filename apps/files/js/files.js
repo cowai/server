@@ -33,6 +33,9 @@
 		},
 		// update quota
 		updateStorageQuotas: function() {
+			Files._updateStorageQuotasThrottled();
+		},
+		_updateStorageQuotas: function() {
 			var state = Files.updateStorageQuotas;
 			state.call = $.getJSON(OC.filePath('files','ajax','getstoragestats.php'),function(response) {
 				Files.updateQuota(response);
@@ -356,6 +359,7 @@
 	};
 
 	Files._updateStorageStatisticsDebounced = _.debounce(Files._updateStorageStatistics, 250);
+	Files._updateStorageQuotasThrottled = _.throttle(Files._updateStorageQuotas, 30000);
 	OCA.Files.Files = Files;
 })();
 
@@ -451,21 +455,20 @@ var dragOptions={
 		$('.crumbmenu').removeClass('canDropChildren');
 	},
 	drag: function(event, ui) {
-		var scrollingArea = FileList.$container;
+		var scrollingArea = window;
 		var currentScrollTop = $(scrollingArea).scrollTop();
 		var scrollArea = Math.min(Math.floor($(window).innerHeight() / 2), 100);
 
 		var bottom = $(window).innerHeight() - scrollArea;
 		var top = $(window).scrollTop() + scrollArea;
 		if (event.pageY < top) {
-			$('html, body').animate({
-
-				scrollTop: $(scrollingArea).scrollTop(currentScrollTop - 10)
+			$(scrollingArea).animate({
+				scrollTop: currentScrollTop - 10
 			}, 400);
 
 		} else if (event.pageY > bottom) {
-			$('html, body').animate({
-				scrollTop: $(scrollingArea).scrollTop(currentScrollTop + 10)
+			$(scrollingArea).animate({
+				scrollTop: currentScrollTop + 10
 			}, 400);
 		}
 

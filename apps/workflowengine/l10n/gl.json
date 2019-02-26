@@ -7,7 +7,7 @@
     "Group list is empty" : "A lista de grupos está baleira",
     "Unable to retrieve the group list" : "Non é posíbel recuperar a lista de grupos",
     "Saved" : "Gardado",
-    "Saving failed:" : "Produciuse unha falla ao gardar:",
+    "Saving failed:" : "Produciuse un fallo ao gardar:",
     "Add rule group" : "Engadir unha regra de grupo",
     "File MIME type" : "Tipo MIME do ficheiro",
     "is" : "é",
@@ -46,8 +46,8 @@
     "Desktop client" : "Cliente de escritorio",
     "Thunderbird & Outlook addons" : "Complementos do Thunderbird e do Outlook",
     "User group membership" : "Pertencia a un grupo de usuarios",
-    "is member of" : "é participante en",
-    "is not member of" : "non é participante en",
+    "is member of" : "é membro de",
+    "is not member of" : "non é membro de",
     "The given operator is invalid" : "O operador indicado é incorrecto",
     "The given regular expression is invalid" : "A expresión regular indicada é incorrecta",
     "The given file size is invalid" : "O tamaño do ficheiro indicado é incorrecto",
@@ -66,9 +66,10 @@
     "Check %s does not exist" : "Non existe a proba %s",
     "Check %s is invalid" : "A proba %s é incorrecta",
     "Check #%s does not exist" : "Non existe a proba num. %s ",
-    "Workflow" : "Fluxo de traballo",
+    "Tag management" : "Xestión de etiquetas",
     "Files workflow engine" : "Motor de fluxo de traballo de ficheiros",
     "Open documentation" : "Documentación aberta",
-    "Loading…" : "Cargando…"
+    "Loading…" : "Cargando…",
+    "Workflow" : "Fluxo de traballo"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

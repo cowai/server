@@ -26,9 +26,9 @@
 namespace OC\Files\ObjectStore;
 
 use Icewind\Streams\CallbackWrapper;
+use Icewind\Streams\CountWrapper;
 use Icewind\Streams\IteratorDirectory;
 use OC\Files\Cache\CacheEntry;
-use OC\Files\Stream\CountReadStream;
 use OCP\Files\NotFoundException;
 use OCP\Files\ObjectStore\IObjectStore;
 
@@ -436,30 +436,42 @@ class ObjectStoreStorage extends \OC\Files\Storage\Common {
 		$stat['mimetype'] = $mimetype;
 		$stat['etag'] = $this->getETag($path);
 
-		$fileId = $this->getCache()->put($path, $stat);
+		$exists = $this->getCache()->inCache($path);
+		$uploadPath = $exists ? $path : $path . '.part';
+		$fileId = $this->getCache()->put($uploadPath, $stat);
+		$urn = $this->getURN($fileId);
 		try {
 			//upload to object storage
 			if ($size === null) {
-				$countStream = CountReadStream::wrap($stream, function ($writtenSize) use ($fileId, &$size) {
+				$countStream = CountWrapper::wrap($stream, function ($writtenSize) use ($fileId, &$size) {
 					$this->getCache()->update($fileId, [
 						'size' => $writtenSize
 					]);
 					$size = $writtenSize;
 				});
-				$this->objectStore->writeObject($this->getURN($fileId), $countStream);
+				$this->objectStore->writeObject($urn, $countStream);
 				if (is_resource($countStream)) {
 					fclose($countStream);
 				}
 			} else {
-				$this->objectStore->writeObject($this->getURN($fileId), $stream);
+				$this->objectStore->writeObject($urn, $stream);
 			}
 		} catch (\Exception $ex) {
-			$this->getCache()->remove($path);
+			$this->getCache()->remove($uploadPath);
 			$this->logger->logException($ex, [
 				'app' => 'objectstore',
-				'message' => 'Could not create object ' . $this->getURN($fileId) . ' for ' . $path,
+				'message' => 'Could not create object ' . $urn . ' for ' . $path,
 			]);
 			throw $ex; // make this bubble up
+		}
+
+		if (!$exists) {
+			if ($this->objectStore->objectExists($urn)) {
+				$this->getCache()->move($uploadPath, $path);
+			} else {
+				$this->getCache()->remove($uploadPath);
+				throw new \Exception("Object not found after writing (urn: $urn, path: $path)", 404);
+			}
 		}
 
 		return $size;
