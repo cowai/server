@@ -26,9 +26,9 @@
 namespace OC\Settings\Admin;
 
 use OC\Authentication\TwoFactorAuth\MandatoryTwoFactor;
-use OC\InitialStateService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Encryption\IManager;
+use OCP\IInitialStateService;
 use OCP\IUserManager;
 use OCP\Settings\ISettings;
 
@@ -43,13 +43,13 @@ class Security implements ISettings {
 	/** @var MandatoryTwoFactor */
 	private $mandatoryTwoFactor;
 
-	/** @var InitialStateService */
+	/** @var IInitialStateService */
 	private $initialState;
 
 	public function __construct(IManager $manager,
 								IUserManager $userManager,
 								MandatoryTwoFactor $mandatoryTwoFactor,
-								InitialStateService $initialState) {
+								IInitialStateService $initialState) {
 		$this->manager = $manager;
 		$this->userManager = $userManager;
 		$this->mandatoryTwoFactor = $mandatoryTwoFactor;
