@@ -26,25 +26,34 @@
 namespace OC\Settings\Admin;
 
 use OC\Authentication\TwoFactorAuth\MandatoryTwoFactor;
+use OC\InitialStateService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Encryption\IManager;
 use OCP\IUserManager;
 use OCP\Settings\ISettings;
 
 class Security implements ISettings {
+
 	/** @var IManager */
 	private $manager;
+
 	/** @var IUserManager */
 	private $userManager;
+
 	/** @var MandatoryTwoFactor */
 	private $mandatoryTwoFactor;
 
+	/** @var InitialStateService */
+	private $initialState;
+
 	public function __construct(IManager $manager,
 								IUserManager $userManager,
-								MandatoryTwoFactor $mandatoryTwoFactor) {
+								MandatoryTwoFactor $mandatoryTwoFactor,
+								InitialStateService $initialState) {
 		$this->manager = $manager;
 		$this->userManager = $userManager;
 		$this->mandatoryTwoFactor = $mandatoryTwoFactor;
+		$this->initialState = $initialState;
 	}
 
 	/**
@@ -62,6 +71,12 @@ class Security implements ISettings {
 			}
 		}
 
+		$this->initialState->provideInitialState(
+			'settings',
+			'mandatory2FAState',
+			$this->mandatoryTwoFactor->getState()
+		);
+
 		$parameters = [
 			// Encryption API
 			'encryptionEnabled'       => $this->manager->isEnabled(),
@@ -69,8 +84,6 @@ class Security implements ISettings {
 			'externalBackendsEnabled' => count($this->userManager->getBackends()) > 1,
 			// Modules
 			'encryptionModules'       => $encryptionModuleList,
-			// 2FA settings
-			'mandatory2FAState'       => $this->mandatoryTwoFactor->getState(),
 		];
 
 		return new TemplateResponse('settings', 'settings/admin/security', $parameters, '');

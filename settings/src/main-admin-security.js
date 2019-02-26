@@ -7,9 +7,8 @@ __webpack_nonce__ = btoa(OC.requestToken)
 
 Vue.prototype.t = t;
 
-const initialStateElem = document.getElementById('two-factor-auth-settings-initial-state');
 store.replaceState(
-	JSON.parse(atob(initialStateElem.value))
+	OCP.InitialState.loadState('settings', 'mandatory2FAState')
 )
 
 const View = Vue.extend(AdminTwoFactor)
