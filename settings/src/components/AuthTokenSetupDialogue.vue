@@ -1,0 +1,121 @@
+<!--
+  - @copyright 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
+  -
+  - @author 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
+  -
+  - @license GNU AGPL version 3 or any later version
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<template>
+	<div v-if="!adding">
+		<input v-model="deviceName"
+			   type="text"
+			   @keydown.enter="submit"
+			   :disabled="loading"
+			   :placeholder="t('settings', 'App name')">
+		<button class="button"
+				:disabled="loading"
+				@click="submit">{{ t('settings', 'Create new app password')	}}
+		</button>
+	</div>
+	<div v-else>
+		{{ t('settings', 'Use the credentials below to configure your app or device.') }}
+		{{ t('settings', 'For security reasons this password will only be shown once.') }}
+		<div class="app-password-row">
+			<span class="app-password-label">{{ t('settings', 'Username') }}</span>
+			<input :value="loginName"
+				   type="text"
+				   readonly="readonly"
+				   @focus="selectInput"/>
+		</div>
+		<div class="app-password-row">
+			<span class="app-password-label">{{ t('settings', 'Password') }}</span>
+			<input :value="appPassword"
+				   type="text"
+				   ref="appPassword"
+				   readonly="readonly"
+				   @focus="selectInput"/>
+			<a class="clipboardButton icon icon-clippy"
+			   data-clipboard-target="#new-app-password"></a>
+			<button class="button"
+					@click="reset">
+				{{ t('settings', 'Done') }}
+			</button>
+		</div>
+	</div>
+</template>
+
+<script>
+	import confirmPassword from 'nextcloud-password-confirmation';
+
+	export default {
+		name: 'AuthTokenSetupDialogue',
+		props: {
+			add: {
+				type: Function,
+				required: true,
+			}
+		},
+		data () {
+			return {
+				adding: false,
+				loading: false,
+				deviceName: '',
+				appPassword: '',
+				loginName: '',
+			}
+		},
+		methods: {
+			selectInput (e) {
+				e.currentTarget.select();
+			},
+			submit: function () {
+				confirmPassword()
+					.then(() => {
+						this.loading = true;
+						return this.add(this.deviceName)
+					})
+					.then(token => {
+						this.adding = true;
+						this.loginName = token.loginName;
+						this.appPassword = token.token;
+						this.$nextTick(() => {
+							this.$refs.appPassword.select();
+						})
+					})
+					.catch(err => {
+						console.error('could not create a new app password', err);
+						OC.Notification.showTemporary(t('core', 'Error while creating device token'));
+
+						this.reset();
+
+						throw err;
+					});
+			},
+			reset () {
+				this.adding = false;
+				this.loading = false;
+				this.deviceName = '';
+				this.appPassword = '';
+				this.loginName = '';
+			}
+		}
+	}
+</script>
+
+<style scoped>
+
+</style>
