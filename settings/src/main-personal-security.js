@@ -20,12 +20,14 @@
  */
 
 import Vue from 'vue';
+import VueClipboard from 'vue-clipboard2';
 import VTooltip from 'v-tooltip';
 
 import AuthTokenSection from './components/AuthTokenSection';
 
 __webpack_nonce__ = btoa(OC.requestToken);
 
+Vue.use(VueClipboard);
 Vue.use(VTooltip);
 Vue.prototype.t = t;
 

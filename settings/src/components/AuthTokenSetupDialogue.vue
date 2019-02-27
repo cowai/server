@@ -48,8 +48,11 @@
 				   ref="appPassword"
 				   readonly="readonly"
 				   @focus="selectInput"/>
-			<a class="clipboardButton icon icon-clippy"
-			   data-clipboard-target="#new-app-password"></a>
+			<a class="icon icon-clippy"
+			   v-tooltip="copyTooltipOptions"
+			   v-clipboard:copy="appPassword"
+			   v-clipboard:success="onCopyPassword"
+			   v-clipboard:error="onCopyPasswordFailed"></a>
 			<button class="button"
 					@click="reset">
 				{{ t('settings', 'Done') }}
@@ -76,6 +79,22 @@
 				deviceName: '',
 				appPassword: '',
 				loginName: '',
+				passwordCopied: false,
+			}
+		},
+		computed: {
+			copyTooltipOptions() {
+				if (this.passwordCopied) {
+					return {
+						content:t('core', 'Copied!'),
+						show: true,
+						trigger: 'manual',
+					}
+				} else {
+					return {
+						content: t('core', 'Copy')
+					}
+				}
 			}
 		},
 		methods: {
@@ -102,6 +121,13 @@
 
 						this.reset();
 					});
+			},
+			onCopyPassword() {
+				this.passwordCopied = true;
+				setTimeout(() => this.passwordCopied = false, 3000);
+			},
+			onCopyPasswordFailed() {
+				OC.Notification.showTemporary(t('core', 'Could not copy app password. Please copy it manually.'));
 			},
 			reset () {
 				this.adding = false;
