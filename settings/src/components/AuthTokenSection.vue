@@ -38,6 +38,14 @@
 	import AuthTokenList from './AuthTokenList';
 	import AuthTokenSetupDialogue from './AuthTokenSetupDialogue';
 
+	/**
+	 * Tap into a promise without losing the value
+	 */
+	const tap = cb => val => {
+		cb(val);
+		return val;
+	};
+
 	export default {
 		name: "AuthTokenSection",
 		components: {
@@ -47,12 +55,12 @@
 		data() {
 			return {
 				loading: true,
-				fetchUrl: OC.generateUrl('/settings/personal/authtokens'),
+				baseUrl: OC.generateUrl('/settings/personal/authtokens'),
 				tokens: [],
 			}
 		},
 		mounted() {
-			Axios.get(OC.generateUrl('/settings/personal/authtokens'))
+			Axios.get(this.baseUrl)
 				.then(resp => resp.data)
 				.then(tokens => {
 					console.debug('loaded app tokens', tokens);
@@ -66,27 +74,74 @@
 				});
 		},
 		methods: {
-			addNewToken (token) {
-				console.info('todo: store new token', token);
-				return new Promise(res => {
-					setTimeout(() => res({
-						token: '12345-123345-12345-12344',
-						loginName: 'ferdinand',
-					}), 1500);
-				});
+			addNewToken (name) {
+				console.debug('creating a new app token', name);
+
+				const data = {
+					name,
+				};
+				return Axios.post(this.baseUrl, data)
+					.then(resp => resp.data)
+					.then(tap(() => console.debug('app token created')))
+					.catch(err => {
+						console.error.bind('could not create app password', err);
+						OC.Notification.showTemporary(t('core', 'Error while creating device token'));
+						throw err;
+					});
 			},
-			toggleTokenScope(token, scope, value) {
-				console.info('todo: toggle token scope on server', token, scope, value);
+			toggleTokenScope (token, scope, value) {
+				console.debug('updating app token scope', token.id, scope, value);
+
+				const oldVal = token.scope[scope];
 				token.scope[scope] = value;
+
+				return this.updateToken(token)
+					.then(tap(() => console.debug('app token scope updated')))
+					.catch(err => {
+						console.error.bind('could not update app token scope', err);
+						OC.Notification.showTemporary(t('core', 'Error while updating device token scope'));
+
+						// Restore
+						token.scope[scope] = oldVal;
+
+						throw err;
+					})
 			},
-			rename(token, newName) {
-				console.info('todo: rename token on server', token, newName);
+			rename (token, newName) {
+				console.debug('renaming app token', token.id, token.name, newName);
+
+				const oldName = token.name;
 				token.name = newName;
+
+				return this.updateToken(token)
+					.then(tap(() => console.debug('app token name updated')))
+					.catch(err => {
+						console.error.bind('could not update app token name', err);
+						OC.Notification.showTemporary(t('core', 'Error while updating device token name'));
+
+						// Restore
+						token.name = oldName;
+					})
 			},
-			deleteToken(token) {
-				console.info('todo: delete token on server', token);
+			updateToken (token) {
+				return Axios.put(this.baseUrl + '/' + token.id, token)
+					.then(resp => resp.data)
+			},
+			deleteToken (token) {
+				console.debug('deleting app token', token);
+
 				this.tokens = this.tokens.filter(t => t !== token);
-				// OC.Notification.showTemporary(t('core', 'Error while deleting the token'))
+
+				return Axios.delete(this.baseUrl + '/' + token.id)
+					.then(resp => resp.data)
+					.then(tap(() => console.debug('app token deleted')))
+					.catch(err => {
+						console.error.bind('could not delete app token', err);
+						OC.Notification.showTemporary(t('core', 'Error while deleting the token'));
+
+						// Restore
+						this.tokens.push(token);
+					})
 			}
 		}
 	}

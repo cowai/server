@@ -101,8 +101,6 @@
 						OC.Notification.showTemporary(t('core', 'Error while creating device token'));
 
 						this.reset();
-
-						throw err;
 					});
 			},
 			reset () {
