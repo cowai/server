@@ -223,6 +223,45 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+	td {
+		border-top: 1px solid var(--color-border);
+		max-width: 200px;
+		white-space: normal;
+		vertical-align: middle;
+		position: relative;
 
+		&%icon {
+			overflow: visible;
+			position: relative;
+			width: 16px;
+		}
+
+		&.token-name {
+			padding: 10px 6px;
+
+			&.token-rename {
+				padding: 0;
+			}
+
+			input {
+				width: 100%;
+				margin: 0;
+			}
+		}
+
+		&.more {
+			@extend %icon;
+		}
+
+		&.client {
+			@extend %icon;
+
+			div {
+				opacity: 0.57;
+				width: 44px;
+				height: 44px;
+			}
+		}
+	}
 </style>

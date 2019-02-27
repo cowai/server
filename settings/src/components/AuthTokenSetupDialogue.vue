@@ -38,6 +38,7 @@
 			<span class="app-password-label">{{ t('settings', 'Username') }}</span>
 			<input :value="loginName"
 				   type="text"
+				   class="monospaced"
 				   readonly="readonly"
 				   @focus="selectInput"/>
 		</div>
@@ -45,6 +46,7 @@
 			<span class="app-password-label">{{ t('settings', 'Password') }}</span>
 			<input :value="appPassword"
 				   type="text"
+				   class="monospaced"
 				   ref="appPassword"
 				   readonly="readonly"
 				   @focus="selectInput"/>
@@ -140,6 +142,28 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+	.app-password-row {
+		display: table-row;
 
+		.icon {
+			background-size: 16px 16px;
+			display: inline-block;
+			position: relative;
+			top: 3px;
+			margin-left: 5px;
+			margin-right: 8px;
+		}
+
+	}
+
+	.app-password-label {
+		display: table-cell;
+		padding-right: 1em;
+	}
+
+	.monospaced {
+		width: 245px;
+		font-family: monospace;
+	}
 </style>

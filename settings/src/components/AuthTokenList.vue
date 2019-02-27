@@ -20,7 +20,7 @@
   -->
 
 <template>
-	<table :class="{ 'icon-loading' : loading }">
+	<table id="app-tokens-table" :class="{ 'icon-loading' : loading }">
 		<thead v-if="tokens.length">
 		<tr>
 			<th></th>
@@ -84,6 +84,51 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+	table {
+		width: 100%;
+		min-height: 50px;
+		padding-top: 5px;
+		max-width: 580px;
 
+		th {
+			opacity: .5;
+			padding: 10px 10px 10px 0;
+		}
+	}
+
+	.token-list {
+		td > a.icon-more {
+			transition: opacity var(--animation-quick);
+		}
+
+		a.icon-more {
+			padding: 14px;
+			display: block;
+			width: 44px;
+			height: 44px;
+			opacity: .5;
+		}
+
+		tr {
+			&:hover td > a.icon,
+			td > a.icon:focus,
+			&.active td > a.icon {
+				opacity: 1;
+			}
+		}
+	}
+</style>
+
+<!-- some styles are not scoped to make them work on subcomponents -->
+<style lang="scss">
+	#app-tokens-table {
+		tr > *:nth-child(2) {
+			padding-left: 6px;
+		}
+
+		tr > *:nth-child(3) {
+			text-align: right;
+		}
+	}
 </style>
