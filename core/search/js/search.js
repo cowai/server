@@ -1,4 +1,4 @@
-/*
+/**
  * @copyright Copyright (c) 2018 John Molakvoæ <skjnldsv@protonmail.com>
  *
  * @author John Molakvoæ <skjnldsv@protonmail.com>
@@ -84,28 +84,10 @@
 				self.resetCallback();
 			};
 
-			// Show search
-			document.getElementById('searchbox').style.display = 'block';
-
-			// Register input event
-			document
-				.getElementById('searchbox')
-				.addEventListener('input', _.debounce(self.search, 500), true);
-			document
-				.querySelector('form.searchbox')
-				.addEventListener('submit', function(event) {
-					// Avoid form submit
-					event.preventDefault();
-					_.debounce(self.search, 500);
-				}, true);
-
-			// Register reset
-			document
-				.querySelector('form.searchbox')
-				.addEventListener('reset', _.debounce(self.reset, 500), true);
-
-			// Register esc key shortcut reset if focused
-			document.addEventListener('keyup', function(event) {
+			/**
+			 * keyUp event handler for the escape key
+			 */
+			this.keyUpHandler = function(event) {
 				if (event.defaultPrevented) {
 					return;
 				}
@@ -116,13 +98,16 @@
 					document.getElementById('searchbox').value === ''
 				) {
 					if (key === 'Escape' || key === 'Esc' || key === 27) {
+						document.activeElement.blur(); // remove focus on searchbox
 						_.debounce(self.reset, 500);
 					}
 				}
-			});
+			}
 
-			// Register ctrl+F key shortcut to focus
-			document.addEventListener('keydown', function(event) {
+			/**
+			 * keyDown event handler for the ctrl+F shortcut
+			 */
+			this.keyDownHandler  = function(event) {
 				if (event.defaultPrevented) {
 					return;
 				}
@@ -139,7 +124,52 @@
 						document.getElementById('searchbox').select();
 					}
 				}
-			});
+			}
+
+			// Show search
+			document.getElementById('searchbox').style.display = 'block';
+
+			// Register input event
+			document
+				.getElementById('searchbox')
+				.addEventListener('input', _.debounce(self.search, 500), true);
+			document
+				.querySelector('form.searchbox')
+				.addEventListener('submit', function(event) {
+					event.preventDefault();
+					_.debounce(self.search, 500);
+				}, true);
+
+			// Register reset
+			document
+				.querySelector('form.searchbox')
+				.addEventListener('reset', _.debounce(self.reset, 500), true);
+
+			// Register esc key shortcut reset if focused
+			document.addEventListener('keyup', this.keyUpHandler);
+
+			// Register ctrl+F key shortcut to focus
+			document.addEventListener('keydown', this.keyDownHandler);
+		},
+
+		unregister: function() {
+			// Hide search
+			document.getElementById('searchbox').style.display = 'none';
+
+			// remove focus on searchbox
+			document.activeElement.blur();
+
+			// clear search
+			document.getElementById('searchbox').value = '';
+			this.resetCallback();
+
+			// replace element to remove all events
+			var form = document.querySelector('form.searchbox')
+			var formClone = form.cloneNode(true);
+
+			form.parentNode.replaceChild(formClone, form);
+
+			console.debug('Search handler unregistered');
 		}
 	};
 
