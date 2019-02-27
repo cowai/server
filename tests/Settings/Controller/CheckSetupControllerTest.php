@@ -159,6 +159,7 @@ class CheckSetupControllerTest extends TestCase {
 				'getAppDirsWithDifferentOwner',
 				'hasRecommendedPHPModules',
 				'hasBigIntConversionPendingColumns',
+				'isMysqlUsedWithoutUTF8MB4',
 			])->getMock();
 	}
 
@@ -520,6 +521,11 @@ class CheckSetupControllerTest extends TestCase {
 			->method('hasBigIntConversionPendingColumns')
 			->willReturn([]);
 
+		$this->checkSetupController
+			->expects($this->once())
+			->method('isMysqlUsedWithoutUTF8MB4')
+			->willReturn(false);
+
 		$expected = new DataResponse(
 			[
 				'isGetenvServerWorking' => true,
@@ -563,6 +569,7 @@ class CheckSetupControllerTest extends TestCase {
 				'appDirsWithDifferentOwner' => [],
 				'recommendedPHPModules' => [],
 				'pendingBigIntConversionColumns' => [],
+				'isMysqlUsedWithoutUTF8MB4' => false,
 			]
 		);
 		$this->assertEquals($expected, $this->checkSetupController->check());
@@ -1343,5 +1350,33 @@ Array
 				]
 		);
 		$this->assertEquals($expected, $this->checkSetupController->getFailedIntegrityCheckFiles());
+	}
+
+	public function dataForIsMysqlUsedWithoutUTF8MB4() {
+		return [
+			['sqlite', false, false],
+			['sqlite', true, false],
+			['postgres', false, false],
+			['postgres', true, false],
+			['oci', false, false],
+			['oci', true, false],
+			['mysql', false, true],
+			['mysql', true, false],
+		];
+	}
+
+	/**
+	 * @dataProvider dataForIsMysqlUsedWithoutUTF8MB4
+	 */
+	public function testIsMysqlUsedWithoutUTF8MB4(string $db, bool $useUTF8MB4, bool $expected) {
+		$this->config->expects($this->at(0))
+			->method('getSystemValue')
+			->will($this->returnValue($db));
+		if ($db === 'mysql') {
+			$this->config->expects($this->at(1))
+				->method('getSystemValue')
+				->will($this->returnValue($useUTF8MB4));
+		}
+		$this->assertSame($expected, $this->invokePrivate($this->checkSetupController, 'isMysqlUsedWithoutUTF8MB4'));
 	}
 }
